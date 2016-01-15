@@ -14,6 +14,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Globalization;
 using System.Net;
 using System.Text;
@@ -79,6 +80,23 @@ namespace Amazon.Runtime
             this.errorType = errorType;
             this.requestId = requestId;
             this.statusCode = statusCode;
+        }
+
+        public AmazonServiceException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            this.errorCode = info.GetString("ErrorCode");
+            this.errorType = (ErrorType) info.GetValue("ErrorType", typeof(ErrorType));
+            this.requestId = info.GetString("RequestId");
+            this.statusCode = (HttpStatusCode) info.GetValue("StatusCode", typeof(HttpStatusCode));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("ErrorCode", this.errorCode);
+            info.AddValue("ErrorType", this.ErrorType);
+            info.AddValue("RequestId", this.RequestId);
+            info.AddValue("StatusCode", this.statusCode);
         }
 
         static string BuildGenericErrorMessage(string errorCode, HttpStatusCode statusCode)
